@@ -1,8 +1,8 @@
 package com.mig82.folders.properties;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * An immutable snapshot of the folder properties resolved for a job.
@@ -42,6 +42,8 @@ public final class ResolvedFolderProperties {
     }
 
     private static Map<String, String> immutableCopy(Map<String, String> source) {
-        return Collections.unmodifiableMap(new LinkedHashMap<>(source));
+        Map<String, String> copy = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        copy.putAll(source);
+        return Collections.unmodifiableMap(copy);
     }
 }

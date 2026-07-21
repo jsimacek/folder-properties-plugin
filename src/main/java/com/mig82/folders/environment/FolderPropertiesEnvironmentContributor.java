@@ -17,6 +17,6 @@ public final class FolderPropertiesEnvironmentContributor extends EnvironmentCon
     @SuppressWarnings("rawtypes")
     public void buildEnvironmentFor(Run run, EnvVars env, TaskListener listener)
             throws IOException, InterruptedException {
-        FolderPropertiesSnapshotAction.getOrCreate(run);
+        FolderPropertiesSnapshotAction.createForBuildStart(run);
     }
 }

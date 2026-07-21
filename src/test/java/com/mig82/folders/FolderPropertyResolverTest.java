@@ -49,6 +49,21 @@ class FolderPropertyResolverTest {
     }
 
     @Test
+    void treatsEnvironmentVariableNamesAsCaseInsensitive(JenkinsRule r) throws Exception {
+        Folder parent = folder(r, "resolver-case-parent", true, property("foo", "parent"));
+        Folder child = folder(parent, "child", false, property("FOO", "child"));
+        WorkflowJob job = child.createProject(WorkflowJob.class, "job");
+
+        ResolvedFolderProperties resolved = new FolderPropertyResolver().resolve(job);
+
+        assertEquals(Map.of("FOO", "child"), resolved.getValues());
+        assertEquals("child", resolved.getValues().get("foo"));
+        assertTrue(resolved.getBuildStartValues().isEmpty());
+        assertEquals("resolver-case-parent/child", resolved.getSources().get("FOO"));
+        assertEquals("child", PropertiesLoader.loadFolderProperties(job).get("foo"));
+    }
+
+    @Test
     void handlesMissingPropertiesAndDuplicateKeys(JenkinsRule r) throws Exception {
         Folder empty = r.jenkins.createProject(Folder.class, "resolver-empty");
         WorkflowJob emptyJob = empty.createProject(WorkflowJob.class, "empty-job");

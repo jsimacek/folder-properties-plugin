@@ -10,6 +10,8 @@
     In structures where two or more folders are nested, any property defined for a folder will be overridden by any
     other property of the same name defined by one of its sub-folders.
     <br>
+    Property names are compared case-insensitively, matching Jenkins environment variable semantics.
+    <br>
     Freestyle jobs must opt into inheriting these properties by selecting the <em>Folder Properties</em> build wrapper
     from the <em>Build Environment</em> section of their configuration page.
     <br>
@@ -18,5 +20,7 @@
     Enable <em>Expose these properties at build start</em> only when Declarative environment evaluation or
     Pipeline-from-SCM configuration needs these values before a wrapper or Pipeline step can run. Build-start values
     act as defaults and are snapshotted for the duration of the build.
+    <br>
+    Without that setting, wrappers and Pipeline steps read the current folder configuration whenever they run.
 </body>
 </html>

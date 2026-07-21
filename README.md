@@ -17,6 +17,10 @@ under the `Folder Properties` section.
 In structures where two or more folders are nested, any property defined for a folder will be overridden by any other
 property of the same name defined by one of its sub-folders.
 
+Property names follow Jenkins environment semantics and are case-insensitive
+for precedence. For example, `FOO` and `foo` are treated as the same key, and
+the definition in the closest folder wins.
+
 ![](docs/images/folder-properties-config.png)
 
 By default, folder properties keep their original opt-in behavior: Freestyle
@@ -31,10 +35,16 @@ closer folder defines the same key, the closer definition controls both its
 value and whether it is exposed at build start.
 
 Build-start values are defaults: build parameters and explicit Pipeline
-environment declarations can override them. Jenkins snapshots the resolved
-folder properties the first time a build requests its environment, so the same
-values are used for SCM configuration, Pipeline execution, and controller
-restart recovery even if folder configuration changes while the build runs.
+environment declarations can override them. When at least one resolved key is
+exposed at build start, Jenkins snapshots the resolved folder properties the
+first time the build requests its environment. The same values are then used
+for SCM configuration, Pipeline execution, and controller restart recovery
+even if folder configuration changes while the build runs.
+
+When build-start exposure is not enabled, no persistent snapshot is added to
+the build. Freestyle wrappers and `withFolderProperties` resolve the current
+folder configuration when they run, preserving the behavior of earlier plugin
+versions.
 
 ## Freestyle Jobs
 
@@ -154,6 +164,26 @@ folder('my folder') {
 Folder properties are ordinary environment variables, not credentials. Do not
 store secrets in them; use Jenkins credentials and a credentials-binding step
 for sensitive values.
+
+## Upgrade compatibility
+
+Existing folder configurations do not require migration. The new
+`exposeAtBuildStart` setting defaults to `false`, so existing jobs retain their
+scoped and dynamically resolved behavior.
+
+The corrected `withFolderProperties` step now returns its body's result instead
+of always returning `null`. Pipelines that explicitly depended on the old
+incorrect `null` result should be updated.
+
+Before upgrading from a version with the synchronous implementation, allow
+builds currently executing inside `withFolderProperties` to finish. Those old
+in-flight executions were not restartable. Builds started after the upgrade use
+the resumable implementation.
+
+Builds using build-start exposure persist a
+`FolderPropertiesSnapshotAction`. Back up Jenkins before deployment and avoid
+downgrading without validating old-data handling while such build records are
+retained, since older plugin versions do not contain that action class.
 
 ## Authors & Contributors
 

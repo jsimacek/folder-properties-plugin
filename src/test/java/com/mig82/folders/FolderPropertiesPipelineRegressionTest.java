@@ -3,6 +3,7 @@ package com.mig82.folders;
 import static com.mig82.folders.FolderPropertyResolverTest.folder;
 import static com.mig82.folders.FolderPropertyResolverTest.property;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
@@ -212,5 +213,48 @@ class FolderPropertiesPipelineRegressionTest {
         r.assertBuildStatusSuccess(r.waitForCompletion(run));
         r.assertLogContains("first: initial", run);
         r.assertLogContains("second: initial", run);
+    }
+
+    @Test
+    void preservesDynamicResolutionWhenBuildStartExposureIsDisabled(JenkinsRule r) throws Exception {
+        Folder parent = folder(r, "pipeline-legacy-dynamic", false, property("key", "initial"));
+        WorkflowJob job = PipelineTestHelper.createJob(parent, "pipeline", """
+                withFolderProperties {
+                  echo "first: ${env.key}"
+                }
+                sleep time: 2, unit: 'SECONDS'
+                withFolderProperties {
+                  echo "second: ${env.key}"
+                }
+                """);
+
+        WorkflowRun run = job.scheduleBuild2(0).waitForStart();
+        r.waitForMessage("Sleeping for 2 sec", run);
+        FolderProperties<?> properties = parent.getProperties().get(FolderProperties.class);
+        properties.getProperties()[0].setValue("changed");
+        parent.save();
+
+        r.assertBuildStatusSuccess(r.waitForCompletion(run));
+        assertNull(run.getAction(FolderPropertiesSnapshotAction.class));
+        r.assertLogContains("first: initial", run);
+        r.assertLogContains("second: changed", run);
+    }
+
+    @Test
+    void caseVariantInCloserFolderSuppressesAncestorEarlyValue(JenkinsRule r) throws Exception {
+        Folder ancestor = folder(r, "pipeline-case-precedence", true, property("foo", "ancestor"));
+        Folder parent = folder(ancestor, "child", false, property("FOO", "child"));
+        WorkflowJob job = PipelineTestHelper.createJob(parent, "pipeline", """
+                echo "before: ${env.FOO}"
+                withFolderProperties {
+                  echo "inside: ${env.foo}"
+                }
+                """);
+
+        WorkflowRun run = r.assertBuildStatusSuccess(job.scheduleBuild2(0));
+
+        assertNull(run.getAction(FolderPropertiesSnapshotAction.class));
+        r.assertLogContains("before: null", run);
+        r.assertLogContains("inside: child", run);
     }
 }

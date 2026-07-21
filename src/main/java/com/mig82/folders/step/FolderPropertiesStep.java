@@ -38,8 +38,7 @@ public class FolderPropertiesStep extends Step implements Serializable {
         @Override
         public boolean start() throws Exception {
             Run<?, ?> run = getContext().get(Run.class);
-            EnvVars envVars =
-                    new EnvVars(FolderPropertiesSnapshotAction.getOrCreate(run).getValues());
+            EnvVars envVars = new EnvVars(FolderPropertiesSnapshotAction.resolveValues(run));
             BodyInvoker bodyInvoker = getContext().newBodyInvoker();
             if (!envVars.isEmpty()) {
                 bodyInvoker.withContext(EnvironmentExpander.merge(

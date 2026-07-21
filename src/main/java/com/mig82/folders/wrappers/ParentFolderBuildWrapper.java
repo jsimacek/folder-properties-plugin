@@ -48,7 +48,7 @@ public class ParentFolderBuildWrapper extends SimpleBuildWrapper {
 
         Map<String, String> env = context.getEnv();
         for (Map.Entry<String, String> entry :
-                FolderPropertiesSnapshotAction.getOrCreate(run).getValues().entrySet()) {
+                FolderPropertiesSnapshotAction.resolveValues(run).entrySet()) {
             String key = entry.getKey();
             if (!env.containsKey(key)) {
                 env.put(key, entry.getValue());

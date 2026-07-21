@@ -24,7 +24,7 @@ class FolderPropertiesRestartTest {
         AtomicInteger buildNumber = new AtomicInteger();
 
         sessions.then(r -> {
-            Folder parent = folder(r, "issue-48", false, property("key", "restart-value"));
+            Folder parent = folder(r, "issue-48", true, property("key", "restart-value"));
             WorkflowJob job = PipelineTestHelper.createJob(parent, "pipeline", """
                     withFolderProperties {
                       echo "before restart: ${env.key}"

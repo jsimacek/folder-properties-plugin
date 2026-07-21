@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.mig82.folders.properties.FolderProperties;
 import com.mig82.folders.properties.StringProperty;
 import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
 import org.junit.jupiter.api.Test;
 import org.kohsuke.stapler.StaplerRequest2;
 
@@ -36,5 +37,20 @@ class FolderPropertiesConfigurationTest {
 
         assertEquals(FormValidation.Kind.ERROR, descriptor.doValidate("  ", "value").kind);
         assertEquals(FormValidation.Kind.OK, descriptor.doValidate("key", "value").kind);
+    }
+
+    @Test
+    void loadsLegacyConfigurationWithoutBuildStartField() {
+        FolderProperties<?> configured = new FolderProperties<>();
+        configured.setProperties(new StringProperty[] {new StringProperty("key", "value")});
+        String legacyXml =
+                Jenkins.XSTREAM2.toXML(configured).replaceAll("\\s*<exposeAtBuildStart>.*?</exposeAtBuildStart>", "");
+
+        FolderProperties<?> loaded = (FolderProperties<?>) Jenkins.XSTREAM2.fromXML(legacyXml);
+
+        assertFalse(legacyXml.contains("exposeAtBuildStart"));
+        assertFalse(loaded.isExposeAtBuildStart());
+        assertEquals(1, loaded.getProperties().length);
+        assertEquals("key", loaded.getProperties()[0].getKey());
     }
 }
