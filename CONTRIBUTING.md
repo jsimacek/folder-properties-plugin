@@ -6,6 +6,11 @@ Your pull request will be evaluated by the [Jenkins job](https://ci.jenkins.io/j
 
 Before submitting your change, please assure that you've added tests that verify the change.
 
+## Development requirements
+
+Use a full JDK 21 and Maven 3.9.6 or newer. The plugin targets Jenkins 2.568.1
+LTS and newer releases and does not support building or running on Java 17.
+
 ## Code formatting
 
 Source code and pom file formatting is maintained by the `spotless` maven plugin.
