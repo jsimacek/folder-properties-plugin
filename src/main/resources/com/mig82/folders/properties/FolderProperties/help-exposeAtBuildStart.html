@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Help for build-start folder properties</title>
+</head>
+<body>
+    Exposes this folder's properties as defaults from the beginning of descendant builds. Enable this when a
+    Declarative <code>environment</code> block, Pipeline-from-SCM repository, branch, or Jenkinsfile path needs the
+    values before a build wrapper or <code>withFolderProperties</code> block can run.
+    <br>
+    A definition in a closer folder still wins. Build parameters and explicit Pipeline environment declarations may
+    override these defaults. The values are snapshotted when the build first requests its environment.
+    <br>
+    Git lightweight checkout does not expand variables in the remote URL; use a fixed URL or disable lightweight
+    checkout when the URL contains a folder property reference.
+</body>
+</html>

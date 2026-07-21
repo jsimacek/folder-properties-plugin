@@ -22,10 +22,12 @@ Please don't introduce new spotbugs output.
 
 ## Code coverage
 
-Code coverage reporting is available as a maven target.
-Please try to improve code coverage with tests when you submit pull requests.
+Code coverage reporting is available as a Maven profile. The build enforces a
+minimum of 90% line coverage and 80% branch coverage whenever JaCoCo execution
+data is available. Please improve or preserve coverage with tests when you
+submit pull requests.
 
-* `mvn -P enable-jacoco clean install jacoco:report` reports code coverage
+* `mvn -Penable-jacoco clean verify` reports and checks code coverage
 
 ### Reviewing code coverage
 
