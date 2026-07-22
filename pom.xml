@@ -31,8 +31,8 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/folder-properties-plugin</gitHubRepo>
-    <jenkins.baseline>2.568</jenkins.baseline>
-    <jenkins.version>${jenkins.baseline}.1</jenkins.version>
+    <jenkins.baseline>2.555</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
     <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
   </properties>
