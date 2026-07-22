@@ -9,7 +9,7 @@ and over again for all the jobs inside a folder.
 
 ## Requirements
 
-The plugin supports Jenkins 2.568.1 LTS and newer releases. Supported Jenkins
+The plugin supports Jenkins 2.555.3 LTS and newer releases. Supported Jenkins
 controllers must run on Java 21 or a newer Java version supported by Jenkins.
 Older Jenkins and Java 17 installations are not supported.
 

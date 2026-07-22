@@ -8,7 +8,7 @@ Before submitting your change, please assure that you've added tests that verify
 
 ## Development requirements
 
-Use a full JDK 21 and Maven 3.9.6 or newer. The plugin targets Jenkins 2.568.1
+Use a full JDK 21 and Maven 3.9.6 or newer. The plugin targets Jenkins 2.555.3
 LTS and newer releases and does not support building or running on Java 17.
 
 ## Code formatting
