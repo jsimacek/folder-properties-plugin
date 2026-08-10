@@ -161,25 +161,4 @@
     </plugins>
   </build>
 
-  <profiles>
-    <!--
-      Temporary bootstrap for PR #54. ci.jenkins.io uses the trusted Jenkinsfile
-      from master for fork pull requests, which currently runs Windows with Java 17.
-      Remove this profile after the pull request is merged.
-    -->
-    <profile>
-      <id>ci-pr-54-java-17-bootstrap</id>
-      <activation>
-        <jdk>[17,18)</jdk>
-        <property>
-          <name>env.CHANGE_ID</name>
-          <value>54</value>
-        </property>
-      </activation>
-      <properties>
-        <jenkins.version>2.541.1</jenkins.version>
-      </properties>
-    </profile>
-  </profiles>
-
 </project>
