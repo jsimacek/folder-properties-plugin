@@ -31,7 +31,7 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/folder-properties-plugin</gitHubRepo>
-    <jenkins.baseline>2.479</jenkins.baseline>
+    <jenkins.baseline>2.555</jenkins.baseline>
     <ban-commons-lang-2.skip>false</ban-commons-lang-2.skip>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <spotless.check.skip>false</spotless.check.skip>
@@ -43,7 +43,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-${jenkins.baseline}.x</artifactId>
-        <version>5054.v620b_5d2b_d5e6</version>
+        <version>6715.v52b_c00222d1e</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -62,6 +62,13 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-step-api</artifactId>
+    </dependency>
+
+    <!-- Exercise Pipeline-from-SCM expansion. -->
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>git</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!--Need these to test scripted Pipeline jobs -->
@@ -116,5 +123,63 @@
       <url>https://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>coverage-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>verify</phase>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>LINE</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.90</minimum>
+                    </limit>
+                    <limit>
+                      <counter>BRANCH</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.80</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!--
+      Temporary bootstrap for PR #54. ci.jenkins.io uses the trusted Jenkinsfile
+      from master for fork pull requests, which currently runs Windows with Java 17.
+      Remove this profile after the pull request is merged.
+    -->
+    <profile>
+      <id>ci-pr-54-java-17-bootstrap</id>
+      <activation>
+        <jdk>[17,18)</jdk>
+        <property>
+          <name>env.CHANGE_ID</name>
+          <value>54</value>
+        </property>
+      </activation>
+      <properties>
+        <jenkins.version>2.541.1</jenkins.version>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>

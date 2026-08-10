@@ -1,18 +1,14 @@
 package com.mig82.folders.step;
 
-import com.mig82.folders.properties.PropertiesLoader;
+import com.mig82.folders.environment.FolderPropertiesSnapshotAction;
 import hudson.EnvVars;
 import hudson.Extension;
-import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jenkinsci.plugins.workflow.steps.*;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -23,37 +19,33 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author Miguelangel Fernandez Mendoza and Gong Yi
  */
 public class FolderPropertiesStep extends Step implements Serializable {
-    private static final Logger LOGGER = Logger.getLogger(FolderPropertiesStep.class.getName());
-
     @DataBoundConstructor
     public FolderPropertiesStep() {}
 
     @Override
     public StepExecution start(StepContext stepContext) throws Exception {
-        return new Execution(stepContext, this);
+        return new Execution(stepContext);
     }
 
-    private static class Execution extends SynchronousNonBlockingStepExecution<Void> {
-        private FolderPropertiesStep folderPropertiesStep;
+    private static class Execution extends StepExecution {
+        @Serial
+        private static final long serialVersionUID = 1;
 
-        public Execution(StepContext context, FolderPropertiesStep folderPropertiesStep) {
+        public Execution(StepContext context) {
             super(context);
-            this.folderPropertiesStep = folderPropertiesStep;
         }
 
         @Override
-        protected Void run() throws Exception {
-            LOGGER.log(Level.FINER, "Run in 'withFolderProperties' custom pipeline step");
-            Job job = getContext().get(Run.class).getParent();
-            EnvVars envVars = PropertiesLoader.loadFolderProperties(job);
+        public boolean start() throws Exception {
+            Run<?, ?> run = getContext().get(Run.class);
+            EnvVars envVars = new EnvVars(FolderPropertiesSnapshotAction.resolveValues(run));
             BodyInvoker bodyInvoker = getContext().newBodyInvoker();
             if (!envVars.isEmpty()) {
-                LOGGER.log(Level.FINER, "Find the folder properties");
                 bodyInvoker.withContext(EnvironmentExpander.merge(
                         getContext().get(EnvironmentExpander.class), new ExpanderImpl(envVars)));
             }
-            bodyInvoker.start().get();
-            return null;
+            bodyInvoker.withCallback(BodyExecutionCallback.wrap(getContext())).start();
+            return false;
         }
     }
 
@@ -78,7 +70,7 @@ public class FolderPropertiesStep extends Step implements Serializable {
     public static class DescriptorImpl extends StepDescriptor {
         @Override
         public Set<Class<?>> getRequiredContext() {
-            return Collections.<Class<?>>singleton(TaskListener.class);
+            return Set.of(Run.class, TaskListener.class);
         }
 
         @Override

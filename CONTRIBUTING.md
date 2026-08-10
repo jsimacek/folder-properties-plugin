@@ -6,6 +6,11 @@ Your pull request will be evaluated by the [Jenkins job](https://ci.jenkins.io/j
 
 Before submitting your change, please assure that you've added tests that verify the change.
 
+## Development requirements
+
+Use a full JDK 21 and Maven 3.9.6 or newer. The plugin targets Jenkins 2.555.3
+LTS and newer releases and does not support building or running on Java 17.
+
 ## Code formatting
 
 Source code and pom file formatting is maintained by the `spotless` maven plugin.
@@ -22,10 +27,12 @@ Please don't introduce new spotbugs output.
 
 ## Code coverage
 
-Code coverage reporting is available as a maven target.
-Please try to improve code coverage with tests when you submit pull requests.
+Code coverage reporting is available as a Maven profile. The build enforces a
+minimum of 90% line coverage and 80% branch coverage whenever JaCoCo execution
+data is available. Please improve or preserve coverage with tests when you
+submit pull requests.
 
-* `mvn -P enable-jacoco clean install jacoco:report` reports code coverage
+* `mvn -Penable-jacoco clean verify` reports and checks code coverage
 
 ### Reviewing code coverage
 

@@ -1,7 +1,7 @@
 package com.mig82.folders.wrappers;
 
 import com.mig82.folders.Messages;
-import com.mig82.folders.properties.PropertiesLoader;
+import com.mig82.folders.environment.FolderPropertiesSnapshotAction;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -46,17 +46,15 @@ public class ParentFolderBuildWrapper extends SimpleBuildWrapper {
             EnvVars initialEnvironment)
             throws IOException, InterruptedException {
 
-        Job job = run.getParent(); // The parent of the run is the Job itself.
-        EnvVars envVars = PropertiesLoader.loadFolderProperties(job);
         Map<String, String> env = context.getEnv();
-        for (Map.Entry<String, String> entry : envVars.entrySet()) {
+        for (Map.Entry<String, String> entry :
+                FolderPropertiesSnapshotAction.resolveValues(run).entrySet()) {
             String key = entry.getKey();
             if (!env.containsKey(key)) {
                 env.put(key, entry.getValue());
             }
         }
-
-        LOGGER.log(Level.FINE, "Context env is: {0}", context.getEnv().toString());
+        LOGGER.log(Level.FINER, "Added {0} folder property keys to the build wrapper", env.size());
     }
 
     @Symbol("withFolderProperties")

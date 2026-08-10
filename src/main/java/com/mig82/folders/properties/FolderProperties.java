@@ -29,6 +29,8 @@ public class FolderProperties<C extends AbstractFolder<?>> extends AbstractFolde
      */
     private final CopyOnWriteList<StringProperty> properties = new CopyOnWriteList<StringProperty>();
 
+    private boolean exposeAtBuildStart;
+
     /**
      * Constructor.
      */
@@ -44,6 +46,7 @@ public class FolderProperties<C extends AbstractFolder<?>> extends AbstractFolde
             return null;
         }
 
+        exposeAtBuildStart = formData.optBoolean("exposeAtBuildStart");
         properties.replaceBy(request.bindJSONToList(StringProperty.class, formData.get("properties")));
         return this;
     }
@@ -65,10 +68,19 @@ public class FolderProperties<C extends AbstractFolder<?>> extends AbstractFolde
      */
     @DataBoundSetter
     public void setProperties(StringProperty[] properties) {
-        LOGGER.log(Level.FINER, "FolderProperties.setProperties({0})\n", java.util.Arrays.toString(properties));
+        LOGGER.log(Level.FINER, "Adding {0} folder properties", properties.length);
         for (StringProperty property : properties) {
             this.properties.add(property);
         }
+    }
+
+    public boolean isExposeAtBuildStart() {
+        return exposeAtBuildStart;
+    }
+
+    @DataBoundSetter
+    public void setExposeAtBuildStart(boolean exposeAtBuildStart) {
+        this.exposeAtBuildStart = exposeAtBuildStart;
     }
 
     /*
